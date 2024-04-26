@@ -1,8 +1,5 @@
 %% Distance calibration
 
-clear
-clc
-
 in_16_5 = loadin('data/16.5_in.fig');
 in_18_625 = loadin('data/18.625_in.fig');
 in_20_375 = loadin('data/20.375_in.fig');
@@ -25,13 +22,26 @@ std = [v16(2) v18(2) v20(2) v22(2) v24(2)];
 % Random Uncertainty
 exp = m*l+b;
 
-u_r = dev(exp,vals); % volts
+% u_r = dev(exp,vals); % volts
+
+    a = size(exp);
+    a = a(2);
+    b = a(1);
+    e = zeros(1,a);
+    for i=1:a
+        for j=1:b
+            e(i) = e(i) + (exp(i,j) - vals(i,j))^2;
+        end
+    end
+    f = 1.96*sqrt(e/(length(fit)-2));
 
 figure(1)
-scatter(l,vals)
+plot(v16(3), l(1))
 hold on
-scatter(l,exp)
-errorbar(l,exp,u_r)
+plot(v18(3), l(2))
+plot(v20(3), l(3))
+plot(v22(3), l(4))
+plot(v24(3), l(5))
 hold off
 
 % Systematic uncertainty is calculated in the dedicated section
@@ -40,7 +50,7 @@ hold off
 
 % Values from the optical sensor's datasheet
 % analog output from 4 mA to 20 mA?
-% assuming fast.
+% assuming fast. what is it really?
 resd = 1; % mm
 repeatability = 5; % mm
 accuracy = 10; % mm

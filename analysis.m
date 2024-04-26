@@ -8,9 +8,21 @@
 % There should be no offset for initial?????
 
 
+%% To do
+
+% sanity checking wn: go backwards from our data with mag ratio
+% sanity checking wd: go backwards
+% input amplitude: a hw, work backwards
+% align the phase shifts: 
+% (https://www.mathworks.com/help/signal/ug/align-signals-using-cross-correlation.html)
+% (https://www.mathworks.com/help/signal/ref/alignsignals.html)
+
+
 %% Envelope
 
-envelope = loadin('data/enve.fig');
+% envelope = loadin('data/enve.fig');
+
+envelope = loadin('data/lab4_12_data1.fig');
 
 wd = env(envelope(2,:),envelope(1,:));
 
@@ -27,7 +39,7 @@ k = 136.25; % n/m
 
 wn = sqrt(k/(m_cyl+m_plate)); % rad/s
 
-zeta = sqrt(1-(wd./wn).^2); % damping ratio
+zeta = sqrt(1-(wd(:,1)./wn).^2); % damping ratio
 
 cc = 2*sqrt((m_cyl+m_plate)*k);
 
