@@ -3,16 +3,41 @@
 
 % Do not hit run! Only run sections.
 
-% How did you get k? - mass + deflection
+% How did you get k?
 
 % There should be no offset for initial?????
 
-
 %% Envelope
 
-envelope = loadin('data/enve.fig');
+envelope = load('data/enve.fig');
 
 wd = env(envelope(2,:),envelope(1,:));
+%% Distance calibration
+
+in_16_5 = load('data/16.5 in.fig');
+in_18_625 = load('data/18.625 in.fig');
+in_20_375 = load('data/20.375 in.fig');
+in_22_625 = load('data/22.625 in.fig');
+in_24_75 = load('data/24.75 in.fig');
+
+l = [16.5 18.625 20.375 22.625 24.75];
+
+v16 = [mean(in_16_5(2,:)) std(in_16_5(2,:))];
+v18 = [mean(in_18_625(2,:)) std(in_18_625(2,:))];
+v20 = [mean(in_20_375(2,:)) std(in_20_375(2,:))];
+v22 = [mean(in_22_625(2,:)) std(in_22_625(2,:))];
+v24 = [mean(in_24_75(2,:)) std(in_24_75(2,:))];
+
+vals = [v16(1) v18(1) v20(1) v22(1) v24(1)];
+std = [v16(2) v18(2) v20(2) v22(2) v24(2)];
+
+[b m] = doit(std,l,vals);
+
+% Random Uncertainty
+exp = m*l+b;
+
+u_r = sxy(exp,vals); % volts
+
 
 %% Constants
 
@@ -33,16 +58,33 @@ cc = 2*sqrt((m_cyl+m_plate)*k);
 
 c = zeta*cc;
 
+%% Systematic Uncertainty
+
+% Values from the optical sensor's datasheet
+% analog output from 4 mA to 20 mA?
+% assuming fast. what is it really?
+% need to calibrate the sensor for a) distance and b) zeta
+resd = 1; % mm
+repeatability = 5; % mm
+accuracy = 10; % mm
+responsetime = 20; % ms
+outputrate = 4; % ms
+resb = 16; % bits
+hyst = 10; % mm. Sheet says 10 ... 1000
+
+% from the measuring
+res = 1/8; % in
+
 %% 10
 
 % Getting the fits
 
-dr10_i1 = loadin('data/10_4_19.fig');
-dr10_i2 = loadin('data/10_i2_4_19.fig');
-dr10_i3 = loadin('data/10_i3_4_19.fig');
-dr10_d1 = loadin('data/10d_4_19.fig');
-dr10_d2 = loadin('data/10_d2_4_19.fig');
-dr10_d3 = loadin('data/10_d3_4_19.fig');
+dr10_i1 = load('data/10_4_19.fig');
+dr10_i2 = load('data/10_i2_4_19.fig');
+dr10_i3 = load('data/10_i3_4_19.fig');
+dr10_d1 = load('data/10d_4_19.fig');
+dr10_d2 = load('data/10_d2_4_19.fig');
+dr10_d3 = load('data/10_d3_4_19.fig');
 
 a = [0.1 2 1 1];
 
@@ -77,12 +119,12 @@ standdev = dev(new_eles,old_eles); % V or mV?
 
 % Getting the fits
 
-r15_i1 = loadin('data/15_4_19.fig');
-r15_i2 = loadin('data/15_i2_4_19.fig');
-r15_i3 = loadin('data/15_i3_4_19.fig');
-r15_d1 = loadin('data/15d_4_19.fig');
-r15_d2 = loadin('data/15_d2_4_19.fig');
-r15_d3 = loadin('data/15_d3_4_19.fig');
+r15_i1 = load('data/15_4_19.fig');
+r15_i2 = load('data/15_i2_4_19.fig');
+r15_i3 = load('data/15_i3_4_19.fig');
+r15_d1 = load('data/15d_4_19.fig');
+r15_d2 = load('data/15_d2_4_19.fig');
+r15_d3 = load('data/15_d3_4_19.fig');
 
 a = [0.1 5.5 0 1.1];
 
@@ -113,16 +155,17 @@ new_eles = fetch(eles,vals);
 
 standdev = dev(new_eles,old_eles);
 
+
 %% 20
 
 % Get the fits. i1 and i2 look a little strange
 
-r20_i1 = loadin('data/20_4_19.fig');
-r20_i2 = loadin('data/20_i2_4_19.fig');
-r20_i3 = loadin('data/20_i3_4_19.fig');
-r20_d1 = loadin('data/20d_4_19.fig');
-r20_d2 = loadin('data/20_d2_4_19.fig');
-r20_d3 = loadin('data/20_d3_4_19.fig');
+r20_i1 = load('data/20_4_19.fig');
+r20_i2 = load('data/20_i2_4_19.fig');
+r20_i3 = load('data/20_i3_4_19.fig');
+r20_d1 = load('data/20d_4_19.fig');
+r20_d2 = load('data/20_d2_4_19.fig');
+r20_d3 = load('data/20_d3_4_19.fig');
 
 a = [0.2 8.5 0 1];
 
@@ -157,12 +200,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr25_i1 = loadin('data/25_4_19.fig');
-dr25_i2 = loadin('data/25_i2_4_19.fig');
-dr25_i3 = loadin('data/25_i3_4_19.fig');
-dr25_d1 = loadin('data/25d_4_19.fig');
-dr25_d2 = loadin('data/25_d2_4_19.fig');
-dr25_d3 = loadin('data/25_d3_4_19.fig');
+dr25_i1 = load('data/25_4_19.fig');
+dr25_i2 = load('data/25_i2_4_19.fig');
+dr25_i3 = load('data/25_i3_4_19.fig');
+dr25_d1 = load('data/25d_4_19.fig');
+dr25_d2 = load('data/25_d2_4_19.fig');
+dr25_d3 = load('data/25_d3_4_19.fig');
 
 a = [0.25 12 -1 1];
 
@@ -197,12 +240,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr30_i1 = loadin('data/30_4_19.fig');
-dr30_i2 = loadin('data/30_i2_4_19.fig');
-dr30_i3 = loadin('data/30_i3_4_19.fig');
-dr30_d1 = loadin('data/30d_4_19.fig');
-dr30_d2 = loadin('data/30_d2_4_19.fig');
-dr30_d3 = loadin('data/30_d3_4_19.fig');
+dr30_i1 = load('data/30_4_19.fig');
+dr30_i2 = load('data/30_i2_4_19.fig');
+dr30_i3 = load('data/30_i3_4_19.fig');
+dr30_d1 = load('data/30d_4_19.fig');
+dr30_d2 = load('data/30_d2_4_19.fig');
+dr30_d3 = load('data/30_d3_4_19.fig');
 
 a = [0.5 15 0 1];
 
@@ -237,12 +280,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr35_i1 = loadin('data/35_4_19.fig');
-dr35_i2 = loadin('data/35_i2_4_19.fig');
-dr35_i3 = loadin('data/35_i3_4_19.fig');
-dr35_d1 = loadin('data/35d_4_19.fig');
-dr35_d2 = loadin('data/35_d2_4_19.fig');
-dr35_d3 = loadin('data/35_d3_4_19.fig');
+dr35_i1 = load('data/35_4_19.fig');
+dr35_i2 = load('data/35_i2_4_19.fig');
+dr35_i3 = load('data/35_i3_4_19.fig');
+dr35_d1 = load('data/35d_4_19.fig');
+dr35_d2 = load('data/35_d2_4_19.fig');
+dr35_d3 = load('data/35_d3_4_19.fig');
 
 a = [0.7 18 0 1];
 
@@ -277,12 +320,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr40_i1 = loadin('data/40_4_19.fig');
-dr40_i2 = loadin('data/40_i2_4_19.fig');
-dr40_i3 = loadin('data/40_i3_4_19.fig');
-dr40_d1 = loadin('data/40d_4_19.fig');
-dr40_d2 = loadin('data/40_d2_4_19.fig');
-dr40_d3 = loadin('data/40_d3_4_19.fig');
+dr40_i1 = load('data/40_4_19.fig');
+dr40_i2 = load('data/40_i2_4_19.fig');
+dr40_i3 = load('data/40_i3_4_19.fig');
+dr40_d1 = load('data/40d_4_19.fig');
+dr40_d2 = load('data/40_d2_4_19.fig');
+dr40_d3 = load('data/40_d3_4_19.fig');
 
 a = [0.1 22 0 1];
 
@@ -317,12 +360,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr45_i1 = loadin('data/45_4_19.fig');
-dr45_i2 = loadin('data/45_i2_4_19.fig');
-dr45_i3 = loadin('data/45_i3_4_19.fig');
-dr45_d1 = loadin('data/45d_4_19.fig');
-dr45_d2 = loadin('data/45_d2_4_19.fig');
-dr45_d3 = loadin('data/45_d3_4_19.fig');
+dr45_i1 = load('data/45_4_19.fig');
+dr45_i2 = load('data/45_i2_4_19.fig');
+dr45_i3 = load('data/45_i3_4_19.fig');
+dr45_d1 = load('data/45d_4_19.fig');
+dr45_d2 = load('data/45_d2_4_19.fig');
+dr45_d3 = load('data/45_d3_4_19.fig');
 
 a = [0.2 25 0 1];
 
@@ -357,12 +400,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr50_i1 = loadin('data/50_4_19.fig');
-dr50_i2 = loadin('data/50_i2_4_19.fig');
-dr50_i3 = loadin('data/50_i3_4_19.fig');
-dr50_d1 = loadin('data/50d_4_19.fig');
-dr50_d2 = loadin('data/50_d2_4_19.fig');
-dr50_d3 = loadin('data/50_d3_4_19.fig');
+dr50_i1 = load('data/50_4_19.fig');
+dr50_i2 = load('data/50_i2_4_19.fig');
+dr50_i3 = load('data/50_i3_4_19.fig');
+dr50_d1 = load('data/50d_4_19.fig');
+dr50_d2 = load('data/50_d2_4_19.fig');
+dr50_d3 = load('data/50_d3_4_19.fig');
 
 a = [0.04 28 0 1];
 
@@ -397,12 +440,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr55_i1 = loadin('data/55.fig');
-dr55_i2 = loadin('data/55_i2_4_19.fig');
-dr55_i3 = loadin('data/55_i3_4_19.fig');
-dr55_d1 = loadin('data/55d_4_19.fig');
-dr55_d2 = loadin('data/55_d2_4_19.fig');
-dr55_d3 = loadin('data/55_d3_4_19.fig');
+dr55_i1 = load('data/55.fig');
+dr55_i2 = load('data/55_i2_4_19.fig');
+dr55_i3 = load('data/55_i3_4_19.fig');
+dr55_d1 = load('data/55d_4_19.fig');
+dr55_d2 = load('data/55_d2_4_19.fig');
+dr55_d3 = load('data/55_d3_4_19.fig');
 
 a = [0.04 31.5 0 1];
 
@@ -437,12 +480,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr60_i1 = loadin('data/60_4_19.fig');
-dr60_i2 = loadin('data/60_i2_4_19.fig');
-dr60_i3 = loadin('data/60_i3_4_19.fig');
-dr60_d1 = loadin('data/60d_4_19.fig');
-dr60_d2 = loadin('data/60_d2_4_19.fig');
-dr60_d3 = loadin('data/60_d3_4_19.fig');
+dr60_i1 = load('data/60_4_19.fig');
+dr60_i2 = load('data/60_i2_4_19.fig');
+dr60_i3 = load('data/60_i3_4_19.fig');
+dr60_d1 = load('data/60d_4_19.fig');
+dr60_d2 = load('data/60_d2_4_19.fig');
+dr60_d3 = load('data/60_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -477,12 +520,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr65_i1 = loadin('data/65c');
-dr65_i2 = loadin('data/65_i2_4_19.fig');
-dr65_i3 = loadin('data/65_i3_4_19.fig');
-dr65_d1 = loadin('data/65d_4_19.fig');
-dr65_d2 = loadin('data/65_d2_4_19.fig');
-dr65_d3 = loadin('data/65_d3_4_19.fig');
+dr65_i1 = load('data/65c');
+dr65_i2 = load('data/65_i2_4_19.fig');
+dr65_i3 = load('data/65_i3_4_19.fig');
+dr65_d1 = load('data/65d_4_19.fig');
+dr65_d2 = load('data/65_d2_4_19.fig');
+dr65_d3 = load('data/65_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -517,12 +560,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr70_i1 = loadin('data/70_4_19.fig');
-dr70_i2 = loadin('data/70_i2_4_19.fig');
-dr70_i3 = loadin('data/70_i3_4_19.fig');
-dr70_d1 = loadin('data/70d_4_19.fig');
-dr70_d2 = loadin('data/70_d2_4_19.fig');
-dr70_d3 = loadin('data/70_d3_4_19.fig');
+dr70_i1 = load('data/70_4_19.fig');
+dr70_i2 = load('data/70_i2_4_19.fig');
+dr70_i3 = load('data/70_i3_4_19.fig');
+dr70_d1 = load('data/70d_4_19.fig');
+dr70_d2 = load('data/70_d2_4_19.fig');
+dr70_d3 = load('data/70_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -557,12 +600,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr75_i1 = loadin('data/75_4_19.fig');
-dr75_i2 = loadin('data/75_i2_4_19.fig');
-dr75_i3 = loadin('data/75_i3_4_19.fig');
-dr75_d1 = loadin('data/75d_4_19.fig');
-dr75_d2 = loadin('data/75_d2_4_19.fig');
-dr75_d3 = loadin('data/75_d3_4_19.fig');
+dr75_i1 = load('data/75_4_19.fig');
+dr75_i2 = load('data/75_i2_4_19.fig');
+dr75_i3 = load('data/75_i3_4_19.fig');
+dr75_d1 = load('data/75d_4_19.fig');
+dr75_d2 = load('data/75_d2_4_19.fig');
+dr75_d3 = load('data/75_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -597,12 +640,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr80_i1 = loadin('data/80_4_19.fig');
-dr80_i2 = loadin('data/80_i2_4_19.fig');
-dr80_i3 = loadin('data/80_i3_4_19.fig');
-dr80_d1 = loadin('data/80d_4_19.fig');
-dr80_d2 = loadin('data/80_d2_4_19.fig');
-dr80_d3 = loadin('data/80_d3_4_19.fig');
+dr80_i1 = load('data/80_4_19.fig');
+dr80_i2 = load('data/80_i2_4_19.fig');
+dr80_i3 = load('data/80_i3_4_19.fig');
+dr80_d1 = load('data/80d_4_19.fig');
+dr80_d2 = load('data/80_d2_4_19.fig');
+dr80_d3 = load('data/80_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -637,12 +680,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr85_i1 = loadin('data/85_4_19.fig');
-dr85_i2 = loadin('data/85_i2_4_19.fig');
-dr85_i3 = loadin('data/85_i3_4_19.fig');
-dr85_d1 = loadin('data/85d_4_19.fig');
-dr85_d2 = loadin('data/85_d2_4_19.fig');
-dr85_d3 = loadin('data/85_d3_4_19.fig');
+dr85_i1 = load('data/85_4_19.fig');
+dr85_i2 = load('data/85_i2_4_19.fig');
+dr85_i3 = load('data/85_i3_4_19.fig');
+dr85_d1 = load('data/85d_4_19.fig');
+dr85_d2 = load('data/85_d2_4_19.fig');
+dr85_d3 = load('data/85_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -677,12 +720,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr90_i1 = loadin('data/90_4_19.fig');
-dr90_i2 = loadin('data/90_i2_4_19.fig');
-dr90_i3 = loadin('data/90_i3_4_19.fig');
-dr90_d1 = loadin('data/90d_4_19.fig');
-dr90_d2 = loadin('data/90_d2_4_19.fig');
-dr90_d3 = loadin('data/90_d3_4_19.fig');
+dr90_i1 = load('data/90_4_19.fig');
+dr90_i2 = load('data/90_i2_4_19.fig');
+dr90_i3 = load('data/90_i3_4_19.fig');
+dr90_d1 = load('data/90d_4_19.fig');
+dr90_d2 = load('data/90_d2_4_19.fig');
+dr90_d3 = load('data/90_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -717,12 +760,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr95_i1 = loadin('data/95_4_19.fig');
-dr95_i2 = loadin('data/95_i2_4_19.fig');
-dr95_i3 = loadin('data/95_i3_4_19.fig');
-dr95_d1 = loadin('data/95d_4_19.fig');
-dr95_d2 = loadin('data/95_d2_4_19.fig');
-dr95_d3 = loadin('data/95_d3_4_19.fig');
+dr95_i1 = load('data/95_4_19.fig');
+dr95_i2 = load('data/95_i2_4_19.fig');
+dr95_i3 = load('data/95_i3_4_19.fig');
+dr95_d1 = load('data/95d_4_19.fig');
+dr95_d2 = load('data/95_d2_4_19.fig');
+dr95_d3 = load('data/95_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -757,12 +800,12 @@ standdev = dev(new_eles,old_eles);
 
 % Getting the fit
 
-dr100_i1 = loadin('data/100_4_19.fig');
-dr100_i2 = loadin('data/100_i2_4_19.fig');
-dr100_i3 = loadin('data/100_i3_4_19.fig');
-dr100_d1 = loadin('data/100d_4_19.fig');
-dr100_d2 = loadin('data/100_d2_4_19.fig');
-dr100_d3 = loadin('data/100_d3_4_19.fig');
+dr100_i1 = load('data/100_4_19.fig');
+dr100_i2 = load('data/100_i2_4_19.fig');
+dr100_i3 = load('data/100_i3_4_19.fig');
+dr100_d1 = load('data/100d_4_19.fig');
+dr100_d2 = load('data/100_d2_4_19.fig');
+dr100_d3 = load('data/100_d3_4_19.fig');
 
 a = [0.027 34 0 1.1];
 
@@ -792,3 +835,121 @@ eles = linspace(0,4.995,1000);
 new_eles = fetch(eles,vals);
 
 standdev = dev(new_eles,old_eles);
+
+%% Functions
+
+% loads the graphs
+function a=load(data) 
+    c = openfig(data,'invisible');
+    b = [findobj(c,'-property','XData'); findobj(c,'-property','YData')];
+    a = [b(1).XData; b(2).YData];
+end
+
+% graphs the two graphs (main and fit)
+function b=graph(data,fit,n)
+    figure(n)
+    plot(data(1,:),data(2,:));
+    hold on
+    fplot(@(x) fit(1)*sin(fit(2)*x+fit(3))+fit(4),[0 5])
+    hold off
+end
+
+% fits the data
+function c=fit(data,vals)
+    b = statset('MaxIter',100000);
+    b.RobustWgtFun = 'bisquare';
+    c = fitnlm(data(1,:),data(2,:),@(a,x) a(1)*sin(a(2)*x+a(3))+a(4),vals,'Options',b);
+    c = table2array(c.Coefficients(:,1));
+    if c(1) < 0
+        c = c.*[-1;1;1;1]-[0;0;pi();0];
+    end
+end
+
+% first column is the magnitude ratio, second is the phase shift
+function d=secondvals(w,wn,zeta)
+    a = (2*zeta*w/wn);
+    b = (1-(w/wn).^2);
+
+    d = zeros(6,2);
+    d(:,1) = (1./sqrt(a.^2+b.^2))';
+    d(:,2) = (-atan(a./b))';
+end
+
+% makes a matrix
+function e=fetch(x,func)
+    e = zeros(length(x),1);
+    for i=1:length(func)
+        e = [e,(func(1,i)*sin(func(2,i)*x+func(3,i))+func(4,i))'];
+    end
+    e = e(:,2:end);
+end
+
+function f=dev(fit,data)
+    a = size(fit);
+    a = a(2);
+    b = a(1);
+    e = zeros(1,a);
+    for i=1:a
+        for j=1:b
+            e(i) = e(i) + (fit(j,i) - data(j,i))^2;
+        end
+    end
+    f = 1.96*sqrt(e/(length(fit)-2));
+end
+
+% Weighted linear regression. S is the standard deviation of the y data, 
+% X is the x data, and y is the mean of the y data per x point.
+function [g,h] = doit(s,x,y)
+
+    u = 1.96*s/sqrt(500);
+
+    w = 1./u.^2;
+    ss = sum(w);
+
+    a = 0;
+    b = 0;
+    c = 0;
+    d = 0;
+
+    for i = 1:length(x)
+        a = a + w(i)*x(i)^2;
+        b = b + w(i)*x(i);
+        c = c + w(i)*y(i);
+        d = d + w(i)*x(i)*y(i);
+    end
+
+    bs = ss*a-(b)^2;
+
+    g = (a*c-b*d)/bs;
+    h = (ss*d-b*c)/bs;
+end
+
+% std for lin reg
+function i = sxy(exp,ac)
+    if length(exp) == length(ac)
+        i = sqrt(sum((exp-ac).^2)/(length(exp)-2));
+    end
+end
+
+% returns the angular frequency and it's raw magnitude, as well as a plot of the data
+function j = env(data,tvec)
+    % number of data points:
+    n = length(data);
+    % sampling rate:
+    fs = 1/(tvec(2)-tvec(1));
+    
+    % define the frequency vector:
+    fBase = [1:n/2-1]*fs/n;
+    % transform the time-domain data to the frequency domain:
+    FT_data = fft(data);
+    
+    new = abs(FT_data(2:n/2));
+    [b, i] = sort(new(:), 'descend');
+    j = [2*pi*fs*i(1:3)/1000 b(1:3)];
+
+    figure;plot(fBase,new);grid
+    xlim([0 8])
+    xlabel('Frequency (Hz)')
+    ylabel('Amplitude')
+    title('Fourier transform of the data')
+end
