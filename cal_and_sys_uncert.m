@@ -28,10 +28,15 @@ exp = m*l+b;
 u_r = dev(exp,vals); % volts
 
 figure(1)
-scatter(l,vals)
+scatter(l,vals,'b')
 hold on
-scatter(l,exp)
-errorbar(l,exp,u_r)
+scatter(l,exp,'r')
+fplot(@(x) m*x+b,[15,25])
+errorbar(l,exp,u_r,'LineStyle','none','Color','b')
+legend("Experimental","Fit",['V = ' num2str(m) 'd  ' num2str(b)],'Location','southeast')
+title("Optical Sensor Calibration")
+xlabel("Distance (inches)")
+ylabel("Voltage (V)")
 hold off
 
 % Systematic uncertainty is calculated in the dedicated section

@@ -4,9 +4,9 @@ function b=graphit(data,fit,n)
     plot(data(1,:),data(2,:));
     hold on
     fplot(@(x) fit(1)*sin(fit(2)*x+fit(3))+fit(4),[0 5])
-    title("Experimental Values with Fit")
+    title("")
     ylabel("Voltage (V)")
-    xlabel("Time (s)")
-    legend("Experimental Data",['V = ' num2str(fit(1)) 'sin(' num2str(fit(2)) 't + ' num2str(fit(3)) ')+ ' num2str(fit(4))])
+    xlable("Time (s)")
+    legend("Experimental Data",)
     hold off
 end

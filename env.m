@@ -13,7 +13,7 @@ function i = env(data,tvec)
     
     new = abs(FT_data(2:n/2));
     [b, j] = sort(new(:), 'descend');
-    i = [2*pi*fs*j(1:3)/1000 b(1:3)];
+    i = 2*pi*fs*j(1)/1000;
 
     figure;plot(fBase,new);grid
     xlim([0 8])
